@@ -1,0 +1,2 @@
+Code for computing Kashaev-Reshetikhin invariants of knots and links with flat G-connections.
+The main reference is *Invariants of tangles with flat connections in their complements* by Kashaev and Reshetikhin.
