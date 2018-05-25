@@ -1,17 +1,24 @@
 #!/usr/local/bin/sage
 
-def my_inverse(x):
+def symbolic_inverse(x):
     """
-    Group operations on the Poisson dual of GL_2.
-    x should be a tuple of the form
-    (upper-triangular 2x2 matrix, lower-triangular 2x2 matrix)
+    Return the inverse of the possibly-symbolic matrix x.
+    Since x is 2x2 this is not hard to do. 
     """
-    l = x[0]
-    upper = Matrix( [[1/l[0,0], 0], [-l[0,1]/(l[0,0]*l[1,1]), 1/l[1,1]]])
-    r = x[1]
-    lower = Matrix( [[1/r[0,0], -r[1,0]/(r[0,0]*r[1,1])], [0, 1/r[1,1]]])
-    return (upper, lower)
+    return Matrix( [[x[1,1],-x[0,1]], [-x[1,0],x[0,0]]] )/(x[0,0]*x[1,1]-x[0,1]*x[1,0]).simplify_full()
 
+def gl2star_left(x,y, positive = True):
+    if positive:
+        return (y[0], (x[1] * y[1] * symbolic_inverse(x[1])).simplify_full() )
+    elif not positive:
+        return ( (x[0] * y[0] * symbolic_inverse(x[0])).simplify_full(), y[1])
+
+def gl2star_right(x,y, positive = True):
+    if positive:
+        return ((symbolic_inverse(gl2star_left(x,y,positive = True)[0]) * x[0] * gl2star_left(x,y,positive = True)[0]).simplify_full(), x[1] )
+    elif not positive:
+        return (x[0], (symbolic_inverse(gl2star_left(x,y,positive = False)[1]) * x[1] * gl2star_left(x,y,positive = False)[1]).simplify_full())
+        
 class ColoredLink(Link):
     """
     Represents links whose strands are colored by things (quandles, etc.)
@@ -32,11 +39,11 @@ class ColoredLink(Link):
     def __repr__(self):
         return super(ColoredLink, self).__repr__() + "\nColoring is " + str(self._colors)
 
-    def left_color(x,y):
-        return self._coloring_rules[0](x,y)
+    def left_color(x,y,sign):
+        return self._coloring_rules[0](x,y,sign)
 
     def right_color(x,y):
-        return self._coloring_rules[1](x,y)
+        return self._coloring_rules[1](x,y,sign)
 
     def validate_colors(self):
         #Make sure that the coloring at the bottom matches the top
