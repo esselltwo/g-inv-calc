@@ -18,7 +18,45 @@ def gl2star_right(x,y, positive = True):
         return ((symbolic_inverse(gl2star_left(x,y,positive = True)[0]) * x[0] * gl2star_left(x,y,positive = True)[0]).simplify_full(), x[1] )
     elif not positive:
         return (x[0], (symbolic_inverse(gl2star_left(x,y,positive = False)[1]) * x[1] * gl2star_left(x,y,positive = False)[1]).simplify_full())
-        
+
+def transfer_colors(Tietze_data, bottom_colors, coloring_rules):
+    """
+    Given the coloring the input strands of a braid, compute the coloring of the output strands.
+    For example, this can be used to check when a braid coloring extends to a coloring of the closure of the braid.
+    """
+
+    strands_needed = 0
+    for crossing in Tietze_data:
+        if abs(crossing) + 1 > strands_needed: strands_needed = abs(crossing) +1
+
+    if strands_needed == 0:
+        raise ValueError("Invalide Tietze_data {!r}.".format(Tietze_data))
+
+    strands = len(bottom_colors)
+    if strands < strands_needed:
+        raise ValueError("Not enough colors. Needed {}.".format(strands_needed)) 
+
+    current_coloring =  bottom_colors 
+    next_coloring = []
+
+    for crossing in Tietze_data:
+        for i in range(0,strands):
+
+            if i == abs(crossing) - 1:
+                next_coloring.append(coloring_rules[0](current_coloring[i],current_coloring[i+1], crossing >0 ))
+            
+            elif i == abs(crossing):
+                next_coloring.append(coloring_rules[1](current_coloring[i-1],current_coloring[i], crossing >0 ))
+            
+            else:
+                next_coloring.append(current_coloring[i])
+
+        current_coloring = next_coloring
+        next_coloring = []
+
+    return current_coloring
+
+   
 class ColoredLink(Link):
     """
     Represents links whose strands are colored by things (quandles, etc.)
@@ -45,35 +83,5 @@ class ColoredLink(Link):
     def right_color(x,y):
         return self._coloring_rules[1](x,y,sign)
 
-    def validate_colors(self):
-        #Make sure that the coloring at the bottom matches the top
-
-        current_coloring =  self._colors
-        next_coloring = []
-
-        for crossing in self._braid.Tietze():
-            print(crossing)
-            for i in range(0,self._braid.strands()):
-
-                if i == abs(crossing) - 1:
-                    #follow the rule
-                    next_coloring.append("foo")
-                
-                elif i == abs(crossing):
-                    #follow the rule
-                    next_coloring.append("bar")
-                
-                else:
-                    next_coloring.append(current_coloring[i])
-
-            current_coloring = next_coloring
-            next_coloring = []
-
-        print current_coloring
-        if current_coloring == self._colors:
-            return True
-        else:
-            return False
-
-# right(x,y) = 
+    # right(x,y) = 
 # x = ColoredLink(BraidGroup(2)([1]),["a","b"],4)
