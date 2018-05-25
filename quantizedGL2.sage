@@ -1,5 +1,35 @@
 #!/usr/local/bin/sage
 
+class QuantumGL2Algebra:
+    """
+    An instance of U_q(gl_2).
+    """
+
+    def __init__(self, order, parameters, epsilon = "epsilon"):
+
+        if order % 2 ==0:
+            raise ValueError("Order should be odd.")
+        else:
+            self._order = order
+
+        if len(parameters) != 4:
+            raise ValueError("Parameters should be a tuple of four scalars.")
+        else:
+            self._parameters = parameters
+
+        self._preR = PolynomialRing(RationalField(), 'q');
+        self._coefficient_ring = self._preR.quotient(cyclotomic_polynomial(order, self._preR.gen()), epsilon)
+
+    def __repr__(self):
+        out = "Quantum enveloping algebra U_{0}(gl_2) with {0} a primitive {1}th root of unity.\n".format(self._coefficient_ring.gen(), self._order)
+        out += "Actions of (E^{0}, F^{0}, K^{0}, L^{0}) are {1}.".format(self._order, self._parameters)
+        return out
+
+    def parameters(self):
+        return self._parameters
+
+    def coefficient_ring(self):
+            return self._coefficient_ring
 
 class QuantumGL2Element:
     """
