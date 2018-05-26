@@ -5,7 +5,7 @@ class QuantumGL2Algebra:
     An instance of U_q(gl_2).
     """
 
-    def __init__(self, order, parameters, epsilon = "epsilon"):
+    def __init__(self, order, parameters, names = ("epsilon")):
 
         if order % 2 ==0:
             raise ValueError("Order should be odd.")
@@ -18,12 +18,15 @@ class QuantumGL2Algebra:
             self._parameters = parameters
 
         self._preR = PolynomialRing(RationalField(), 'q');
-        self._coefficient_ring = self._preR.quotient(cyclotomic_polynomial(order, self._preR.gen()), epsilon)
+        self._coefficient_ring = self._preR.quotient(cyclotomic_polynomial(order, self._preR.gen()), names[0])
 
     def __repr__(self):
         out = "Quantum enveloping algebra U_{0}(gl_2) with {0} a primitive {1}th root of unity.\n".format(self._coefficient_ring.gen(), self._order)
         out += "Actions of (E^{0}, F^{0}, K^{0}, L^{0}) are {1}.".format(self._order, self._parameters)
         return out
+
+    def _first_ngens(self, num):
+        return (self._coefficient_ring.gen(),)
 
     def parameters(self):
         return self._parameters
