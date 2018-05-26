@@ -5,7 +5,7 @@ class QuantumGL2Algebra:
     An instance of U_q(gl_2).
     """
 
-    def __init__(self, order, parameters, names = ("epsilon")):
+    def __init__(self, order, parameters, names = ("epsilon",)):
 
         if order % 2 ==0:
             raise ValueError("Order should be odd.")
@@ -39,16 +39,15 @@ class QuantumGL2Element:
     An element of the quantized universal enveloping algebra of GL_2.
     """
 
-    def __init__(self, coefficient_dict, ring):
-        self._ring = ring
+    def __init__(self, coefficient_dict, parent):
         self._coefficient_dict = coefficient_dict
-        # self._coefficient_dict[exponents] = coefficient
+        self._parent = parent
 
     def __repr__(self):
         out = ""
 
         for exponents in self._coefficient_dict:
-            out += "({4}) E^{0} F^{1} K^{2} L^{3}".format(exponents[0], exponents[1], exponents[2], ditcexponents[3], self._coefficient_dict[exponents] )
+            out += "({4}) E^{0} F^{1} K^{2} L^{3} + ".format(exponents[0], exponents[1], exponents[2], exponents[3], self._coefficient_dict[exponents] )
 
         return out
 
